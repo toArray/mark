@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// 创建zk连接地址
+	//连接地址
 	hosts := []string{"127.0.0.1:2181"}
 
 	//node
@@ -17,7 +17,7 @@ func main() {
 	conn, _, err := zk.Connect(hosts, time.Second*5)
 	defer conn.Close()
 	if err != nil {
-		fmt.Printf("zk connect is faield. err:%v\n", err)
+		fmt.Printf("zookeeper connect is faield. err:%v\n", err)
 		return
 	}
 
@@ -26,14 +26,14 @@ func main() {
 	acls := zk.WorldACL(zk.PermAll)
 	nodePath, err := conn.Create(path, data, zk.FlagEphemeral, acls)
 	if err != nil {
-		fmt.Printf("zk create node is faield. err:%v\n", err)
+		fmt.Printf("zookeeper create node is faield. err:%v\n", err)
 		return
 	}
 
 	//获得节点信息
 	nodeValue, sate, err := conn.Get(path)
 	if err != nil {
-		fmt.Printf("zk get node is faield. err:%v\n", err)
+		fmt.Printf("zookeeper get node is faield. err:%v\n", err)
 		return
 	}
 	fmt.Printf("nodeValue:%v, nodeSate:%+v", string(nodeValue), sate)
@@ -41,14 +41,14 @@ func main() {
 	//设置节点信息
 	_, err = conn.Set(nodePath, []byte("hello zookeeper"), sate.Version)
 	if err != nil {
-		fmt.Printf("zk set node is faield. err:%v\n", err)
+		fmt.Printf("zookeeper set node is faield. err:%v\n", err)
 		return
 	}
 
 	//获得节点信息
 	nodeValue, sate, err = conn.Get(path)
 	if err != nil {
-		fmt.Printf("zk get node is faield. err:%v\n", err)
+		fmt.Printf("zookeeper get node is faield. err:%v\n", err)
 		return
 	}
 	fmt.Printf("----nodeValue:%v, nodeSate:%+v", string(nodeValue), sate)
@@ -56,7 +56,7 @@ func main() {
 	//删除节点
 	err = conn.Delete(nodePath, sate.Version)
 	if err != nil {
-		fmt.Printf("zk delete node is faield: %v\n", err)
+		fmt.Printf("zookeeper delete node is faield: %v\n", err)
 		return
 	}
 

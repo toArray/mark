@@ -6,7 +6,9 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"gopkg.in/gomail.v2"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,8 +18,8 @@ import (
 func main() {
 	//基础数据
 	userID := int64(30000007)
-	dirPath := fmt.Sprintf("./csv/玩家_%d_历史记录_%d", userID, time.Now().Unix())
-	zipPath := fmt.Sprintf("./csv/玩家_%d_历史记录_%d.zip", userID, time.Now().Unix())
+	dirPath := fmt.Sprintf("./export/玩家_%d_历史记录_%d", userID, time.Now().Unix())
+	zipPath := fmt.Sprintf("./export/玩家_%d_历史记录_%d.zip", userID, time.Now().Unix())
 
 	//数据准备
 	title := []string{"序号", "国家", "ID"}
@@ -29,10 +31,82 @@ func main() {
 		{"5", "bb", "23"},
 	}
 
+	//写入文件数据
 	DoExportData(userID, "充值记录", dirPath, title, data)
 	DoExportData(userID, "登陆记录", dirPath, title, data)
 	DoExportData(userID, "道具变化", dirPath, title, data)
+
+	//压缩文件
 	Zip(dirPath, zipPath)
+
+	//删除文件夹
+	os.RemoveAll(dirPath)
+
+	//看下文件多大
+	fileObj, _ := os.Open(zipPath)
+	defer fileObj.Close()
+	fileInfo, _ := fileObj.Stat()
+	fmt.Printf("文件大小为： %dB\n", fileInfo.Size())
+
+	args := os.Args //获取用户输入的所有参数
+	if args == nil {
+		return
+	}
+
+	//m := gomail.NewMessage()
+	//
+	////发送人
+	//m.SetHeader("From", "820506305@qq.com")
+	////接收人
+	//m.SetHeader("To", "1176154856@qq.com")
+	////抄送人
+	////m.SetAddressHeader("Cc", "xxx@qq.com", "xiaozhujiao")
+	////主题
+	//m.SetHeader("Subject", "导出日志文件")
+	////内容
+	//m.SetBody("text/html", "<h1>导出日志文件</h1>")
+	////附件
+	//m.Attach(zipPath)
+	//
+	////拿到token，并进行连接,第4个参数是填授权码
+	//d := gomail.NewDialer("smtp.qq.com", 587, "820506305@qq.com", "rggtrdokyzuxbegj")
+	//
+	//// 发送邮件
+	//if err := d.DialAndSend(m); err != nil {
+	//	fmt.Printf("DialAndSend err %v:", err)
+	//	panic(err)
+	//}
+	//fmt.Printf("send mail success\n")
+
+	sender := "luoqiang@qiye.com" //发送者腾讯企业邮箱账号
+	password := "pwd123456"       //发送者腾讯企业邮箱密码
+	mailTitle := "邮件标题"           //邮件标题
+	mailBody := "邮件内容"            //邮件内容,可以是html
+
+	//接收者邮箱列表
+	mailTo := []string{
+		"xiejianbin@weile.com",
+		"xiewenliang@weile.com",
+		"tousu@jixiang.cn",
+	}
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", sender)       //发送者企业邮件
+	m.SetHeader("To", mailTo...)      //接收者邮箱列表
+	m.SetHeader("Subject", mailTitle) //邮件标题
+	m.SetBody("text/html", mailBody)  //"邮件内容,可以是html"
+
+	//添加附件
+	m.Attach(zipPath)
+
+	//发送邮件服务器、端口、发件人账号、发件人密码
+	d := gomail.NewDialer("smtp.exmail.qq.com", 465, sender, password)
+	if err := d.DialAndSend(m); err != nil {
+		log.Println("发送失败", err)
+		return
+	}
+
+	log.Println("发送成功")
 }
 
 /*
