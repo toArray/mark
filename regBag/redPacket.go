@@ -10,13 +10,13 @@ const RED_PACKET_MIN_MONEY = 1
 
 //RedPacketModel 红包信息实体
 type RedPacketModel struct {
-	Count          int64   //红包个数
-	Money          int64   //红包金额(单位:分)
-	RemainCount    int64   //剩余红包个数
-	RemainMoney    int64   //剩余红包金额(单位:分)
-	BestLuckMoney  int64   //手气最佳金额(单位:分)
-	BestLuckIndex  int64   //手气最佳索引位置
-	HistoryRewards []int64 //历史红包记录
+	count          int64   //红包个数
+	money          int64   //红包金额(单位:分)
+	remainCount    int64   //剩余红包个数
+	remainMoney    int64   //剩余红包金额(单位:分)
+	bestLuckMoney  int64   //手气最佳金额(单位:分)
+	bestLuckIndex  int64   //手气最佳索引位置
+	historyRewards []int64 //历史红包记录
 }
 
 /*
@@ -32,13 +32,13 @@ func CreateRedPacket(count, money int64) (res *RedPacketModel, err error) {
 	}
 
 	res = &RedPacketModel{
-		Count:          count,
-		Money:          money,
-		RemainCount:    count,
-		RemainMoney:    money,
-		BestLuckMoney:  0,
-		BestLuckIndex:  0,
-		HistoryRewards: nil,
+		count:          count,
+		money:          money,
+		remainCount:    count,
+		remainMoney:    money,
+		bestLuckMoney:  0,
+		bestLuckIndex:  0,
+		historyRewards: nil,
 	}
 
 	return
@@ -51,20 +51,21 @@ Open
 @Return res 	bool	拆红包失败,红包已经被抢光
 */
 func (r *RedPacketModel) Open() (money int64, res bool) {
-	if r.Check() == false {
+	//检测红包是否被抢光
+	if r.Check() {
 		return
 	}
 
 	//最后一个红包
-	if r.RemainCount == 1 {
-		money = r.RemainMoney
+	if r.remainCount == 1 {
+		money = r.remainMoney
 	} else {
 		//最大可用金额 = 剩余红包金额 - 后续多少个没拆的包所需要的保底金额
 		//目的是为了保证后续的包至少都能分到最低保底金额,避免后续未拆的红包出现金额0
-		maxCanUseMoney := r.RemainMoney - RED_PACKET_MIN_MONEY*r.RemainCount
+		maxCanUseMoney := r.remainMoney - RED_PACKET_MIN_MONEY*r.remainCount
 
 		//2倍均值基础金额
-		maxAvg := maxCanUseMoney / r.RemainCount
+		maxAvg := maxCanUseMoney / r.remainCount
 
 		//2倍均值范围数额
 		maxMoney := maxAvg*2 + RED_PACKET_MIN_MONEY
@@ -74,15 +75,15 @@ func (r *RedPacketModel) Open() (money int64, res bool) {
 	}
 
 	//手气最佳
-	if money > r.BestLuckMoney {
-		r.BestLuckMoney = money
-		r.BestLuckIndex = r.Count - r.RemainCount
+	if money > r.bestLuckMoney {
+		r.bestLuckMoney = money
+		r.bestLuckIndex = r.count - r.remainCount
 	}
 
 	res = true
-	r.RemainMoney -= money
-	r.RemainCount--
-	r.HistoryRewards = append(r.HistoryRewards, money)
+	r.remainMoney -= money
+	r.remainCount--
+	r.historyRewards = append(r.historyRewards, money)
 	return
 }
 
@@ -91,5 +92,5 @@ Check
 @Desc 校验红包是否被抢完
 */
 func (r *RedPacketModel) Check() bool {
-	return r.RemainCount == 0
+	return r.remainCount == 0
 }

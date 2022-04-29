@@ -21,7 +21,7 @@ func main() {
 				break
 			}
 
-			fmt.Printf("第%v个人拆红包，金额：%v, 剩余：%v\n", i+1, float64(money)/100.00, red.RemainCount)
+			fmt.Printf("第%v个人拆红包，金额：%v\n", i+1, float64(money)/100.00)
 			if money == 0 {
 				panic(1)
 			}
