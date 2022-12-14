@@ -2,10 +2,17 @@ package main
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"time"
 )
 
 func main() {
+	logger, _ := zap.NewDevelopment()
+	logger.Debug("err", zap.String("test", "test"), zap.String("test2", "test2"))
+	logger.Error("err", zap.String("test", "test"), zap.String("test2", "test2"))
+	logger.Panic("err", zap.String("test", "test"), zap.String("test2", "test2"))
+	return
+
 	go func() {
 		for {
 			time.Sleep(time.Millisecond * 2000)

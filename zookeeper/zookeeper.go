@@ -8,7 +8,7 @@ import (
 
 func main() {
 	//连接地址
-	hosts := []string{"127.0.0.1:2181"}
+	hosts := []string{"127.0.0.1:2181", "127.0.0.1:2182", "127.0.0.1:2183"}
 
 	//node
 	path := "/watch_get"
