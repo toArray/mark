@@ -62,7 +62,7 @@ func getSum(x1, y1, x2, y2 int) int {
 		return sum[x2][y2] - sum[x2][y1-1]
 	}
 
-	if x2 == 0 {
+	if y1 == 0 {
 		return sum[x2][y2] - sum[x1-1][y2]
 	}
 
