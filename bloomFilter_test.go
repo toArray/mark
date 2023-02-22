@@ -26,6 +26,12 @@ type BloomFilter struct {
 	Func [6]SimpleHash
 }
 
+func NewBloomFilterInterface() BloomFilterInterface {
+	var bl BloomFilterInterface
+	bl = new(BloomFilter)
+	return bl
+}
+
 //包测试用
 func TestBloomFilter(t *testing.T) {
 	var b bitset.BitSet            // 定义一个BitSet对象

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	l, err := net.Listen("tcp", ":4044")
+	l, err := net.Listen("tcp.go", ":4044")
 	if err != nil {
 		panic(err)
 	}

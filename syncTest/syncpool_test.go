@@ -9,7 +9,11 @@ import (
 
 func TestA(t *testing.T) {
 	//我们创建⼀个Pool，并实现New()函数
-	sp := sync.Pool{}
+	sp := &sync.Pool{
+		New: func() interface{} {
+			return []int32{}
+		},
+	}
 	item := sp.Get()
 	//打印可以看到，我们通过New返回的⼤⼩为16的[]int
 	fmt.Println("item : ", item)
